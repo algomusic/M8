@@ -44,17 +44,21 @@ public:
       int prevVal = 0;
       for (int i = 0; i < table_size; ++i) {
         int phase = (i + wav_phase_offset) % table_size;
-        // wavetable[i] = (uint8_t)phase;  // Linear ramp from 0 to 255
         prevVal = (phase + prevVal)/2;
         wavetable[i] = (uint8_t)prevVal;
         
       }
     } else if (wave == "square") {
       curr_wave = wave;
+      int prevVal = 255;
       for (int i = 0; i < table_size; ++i) {
         if (i < table_size / 2) {
-          wavetable[i] = 0;
-        } else wavetable[i] = 255;
+          prevVal = (0 + prevVal*7)/8;
+          wavetable[i] = prevVal;
+        } else {
+          prevVal = (255 + prevVal*7)/8;
+          wavetable[i] = prevVal;
+        }
       }
     } else if (wave == "noise") {
       curr_wave = wave;
