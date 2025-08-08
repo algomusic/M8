@@ -43,7 +43,6 @@ void setM8PwmPin(int pin) {
 * @pitchClassSet an int array of chromatic values, 0-11, of size 12 (padded with zeros as required)
 * @key pitch class key, 0-11, where 0 = C root
 */
-inline
 int pitchQuantize(int pitch, int * pitchClassSet, int key) {
   for (int j=0; j<12; j++) {
     int pitchClass = pitch%12;
