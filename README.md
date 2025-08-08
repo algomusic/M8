@@ -6,8 +6,8 @@ A simple audio library for output via a GPIO pin using PWM encoding.
 Small, DIY and low-fi.
 
 Usage overview:
-- Include M8 and required M8 classes
-- Instantiate audio objects
+- Include M8 and desired M8 audio classes
+- Instantiate audio objects for each class
 - In setup(), set parameters such as PWM pin, osc pitch, filter cutoff, and decay amount
 - In loop(), call an ledcWrite() function every 9 microseconds passing the calculated values to the M8_pwm_pin
 - Timing is fragile so, don't block loop() with delays, print statements or complex functions
