@@ -9,11 +9,11 @@ M8Filt filter1;
 M8Env env1;
 unsigned long msNow = millis();
 unsigned long pitchTime = msNow;
-int pitchDelta = 250;
+int pitchDelta = 1000;
 unsigned long followTime = msNow;
-int followDelta = 20;
-float baseCutoff = 0.3;
-float followAmnt = 0.5;
+int followDelta = 5;
+float baseCutoff = 0.1;
+float followAmnt = 0.7;
 int stepCounter = 0;
 int pcPent [] = {0,2,4,7,9};
 int pcTriad [] = {0,4,7,0,0};
@@ -25,8 +25,8 @@ void setup() {
   osc1.setPitch(69); // A 440
   osc1.setDetune(0.7); // 0.0 - 1.0
   filter1.setCutoff(baseCutoff); // 0.0 - 1.0
-  env1.setAttack(0.2); // 0.0 - 1.0
-  env1.setDecay(0.7); // 0.0 - 1.0
+  env1.setAttack(0.3); // 0.0 - 1.0
+  env1.setDecay(0.9); // 0.0 - 1.0
   // Start audio with timer-based callback
   startM8Audio(audioCallback);
   Serial.println("M8 filter envelope follow test");
@@ -45,6 +45,7 @@ void loop() {
       } else currPc[i] = pcTriad[i];
     }
     osc1.setPitch(pitchQuantize(random(36) + 48, currPc, 0));
+    filter1.setCutoff(baseCutoff);
     env1.start();
     stepCounter++;
   }
