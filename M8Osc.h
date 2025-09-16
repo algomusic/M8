@@ -68,7 +68,7 @@ public:
   }
 
   void setFreq(float freq) {
-    phase_fractional = freq / 434.0f;
+    phase_fractional = freq / 390.0f;
     phase_fractional2 = phase_fractional * (1 - detune);
   }
 
@@ -117,7 +117,6 @@ public:
   float phase_fractional2 = 0.999;
   float table_index2 = 0.0;
   float detune = 0.002;
-
 };
   
 #endif /* M8OSC_H_ */
