@@ -27,7 +27,7 @@ public:
 
   void setDecay(float dec) { // 0.0 - 1.0
     raw_decay = dec;
-    decay = 0.9995 + pow(dec, 0.4) * 0.0005;
+    decay = 0.999 + pow(dec, 0.4) * 0.001;
   }
 
   float getDecay() {
