@@ -18,7 +18,7 @@ public:
 
   void setCutoff(float val) { // 0.0 - 1.0
     raw_cutoff = max(0.0f, min(1.0f, val));
-    cutoff = min(1.0, 0.012 + pow(raw_cutoff, 3.5)); // more perceptually salient outcome
+    cutoff = min(1.0, 0.012 + pow(raw_cutoff, 6)); // more perceptually salient outcome
   }
 
   float getCutoff() {
