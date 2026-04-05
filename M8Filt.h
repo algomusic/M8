@@ -25,15 +25,15 @@ public:
     return raw_cutoff;
   }
 
-  uint8_t next(uint8_t sample) { 
-    // exponential moving average filter y[i]=α⋅x[i]+(1−α)⋅y[i−1]  
+  uint8_t next(uint8_t sample) {
+    // exponential moving average filter y[i]=α⋅x[i]+(1−α)⋅y[i−1]
     prev_sample = (sample * cutoff + prev_sample * (1.0 - cutoff));
     return prev_sample;
   }
 
-   uint8_t nextEnvFollow(uint8_t sample, float followAmnt, float envValue) { 
+   uint8_t nextEnvFollow(uint8_t sample, float followAmnt, float envValue) {
     float curr_cutoff = min(1.0f, cutoff * (1 + envValue * followAmnt));
-    // exponential moving average filter y[i]=α⋅x[i]+(1−α)⋅y[i−1]  
+    // exponential moving average filter y[i]=α⋅x[i]+(1−α)⋅y[i−1]
     prev_sample = min(252, (int)(sample * curr_cutoff + prev_sample * (1.0 - cutoff)));
     return prev_sample;
   }

@@ -20,7 +20,7 @@ int pcTriad [] = {0,4,7,0,0};
 
 void setup() {
   Serial.begin(115200);
-  setM8PwmPin(8); // any PWM capable GPIO
+  setM8PwmPin(5); // any PWM capable GPIO
   osc1.setWave("sawtooth"); // "sine", "triangle", "square", "sawtooth", "noise"
   osc1.setPitch(69); // A 440
   osc1.setDetune(0.7); // 0.0 - 1.0

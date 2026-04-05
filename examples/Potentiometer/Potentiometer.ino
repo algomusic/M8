@@ -37,7 +37,7 @@ void loop() {
   if ((long)(now - nextMicros) >= 0) {
     nextMicros += 9;
     uint8_t nextSample = env1.next(filter1.nextEnvFollow(osc1.next(), 0.2, env1.getValue()));
-    ledcWrite(M8_pwm_pin,nextSample);
+    M8_writeSample(nextSample);
   }
 
   // check the poteniomenters and trigger notes when pitch changes

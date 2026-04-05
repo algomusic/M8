@@ -10,46 +10,56 @@
 #ifndef M8OSC_H_
 #define M8OSC_H_
 
+enum M8WaveType {
+  M8_WAVE_SINE,
+  M8_WAVE_TRIANGLE,
+  M8_WAVE_SAWTOOTH,
+  M8_WAVE_SQUARE,
+  M8_WAVE_NOISE
+};
+
 class M8Osc {
 
 public:
   /** Constructor.
-	* Default wavetable specified
+	* Generates default sawtooth wavetable using integer math only — safe during static init.
 	*/
   M8Osc() {
-    setWave("sawtooth"); // default waveform
-    setM8PwmPin(M8_pwm_pin);
+    // Default sawtooth — no String, no Arduino calls, pure integer math
+    int prevVal = 0;
+    for (int i = 0; i < table_size; ++i) {
+      int phase = (i + wav_phase_offset) % table_size;
+      prevVal = (phase + prevVal) / 2;
+      wavetable[i] = (uint8_t)prevVal;
+    }
   }
 
   void setWave(String wave) {
     if (wave == "sine") {
-      curr_wave = wave;
+      wave_type = M8_WAVE_SINE;
       for (int i = 0; i < table_size; i++) {
         wavetable[i] = floor(sin(2 * 3.1459 * i * table_size_inv) * 127.5 + 127.5);
       }
     } else if (wave == "triangle") {
-      curr_wave = wave;
+      wave_type = M8_WAVE_TRIANGLE;
       for (int i = 0; i < table_size; ++i) {
         int phase = (i + wav_phase_offset) % table_size;
         if (phase < table_size / 2) {
-            // Rising edge: 0 to 255
             wavetable[i] = (uint8_t)(phase * 2);
         } else {
-            // Falling edge: 255 to 0
             wavetable[i] = (uint8_t)(255 - (phase - table_size / 2) * 2);
         }
       }
     } else if (wave == "sawtooth") {
-      curr_wave = wave;
+      wave_type = M8_WAVE_SAWTOOTH;
       int prevVal = 0;
       for (int i = 0; i < table_size; ++i) {
         int phase = (i + wav_phase_offset) % table_size;
         prevVal = (phase + prevVal)/2;
         wavetable[i] = (uint8_t)prevVal;
-        
       }
     } else if (wave == "square") {
-      curr_wave = wave;
+      wave_type = M8_WAVE_SQUARE;
       int prevVal = 255;
       for (int i = 0; i < table_size; ++i) {
         if (i < table_size / 2) {
@@ -61,7 +71,7 @@ public:
         }
       }
     } else if (wave == "noise") {
-      curr_wave = wave;
+      wave_type = M8_WAVE_NOISE;
     } else {
       Serial.println("M8 error: waveform " + String(wave) + " is not supported.");
     }
@@ -76,41 +86,42 @@ public:
     setFreq(mtof(pitch));
   }
 
-  uint8_t next() {
-    if (curr_wave == "noise") {
-      return random() * 255;
+  uint8_t IRAM_ATTR next() {
+    if (wave_type == M8_WAVE_NOISE) {
+      return (uint8_t)(esp_random() & 0xFF);
     } else {
       uint8_t nextVal = wavetable[(int)table_index];
       table_index += phase_fractional;
-      if (table_index >= table_size) table_index -= table_size; // wrap
+      if (table_index >= (float)table_size) table_index -= (float)table_size; // wrap
       return nextVal;
     }
   }
 
   void setDetune(float tune) {
-    detune = tune * 0.01;
-    phase_fractional2 = phase_fractional * (1 - detune);
+    detune = tune * 0.01f;
+    phase_fractional2 = phase_fractional * (1.0f - detune);
   }
 
-  uint8_t nextDual() {
-    if (curr_wave == "noise") {
-      return random() * 255;
+  uint8_t IRAM_ATTR nextDual() {
+    if (wave_type == M8_WAVE_NOISE) {
+      return (uint8_t)(esp_random() & 0xFF);
     } else {
       uint8_t nextVal = wavetable[(int)table_index];
       uint8_t nextVal2 = wavetable[(int)table_index2];
       table_index += phase_fractional;
-      if (table_index >= table_size) table_index -= table_size; // wrap
+      if (table_index >= (float)table_size) table_index -= (float)table_size; // wrap
       table_index2 += phase_fractional2;
-      if (table_index2 >= table_size) table_index2 -= table_size; // wrap
+      if (table_index2 >= (float)table_size) table_index2 -= (float)table_size; // wrap
       return (nextVal + nextVal2)>>1;
     }
   }
 
+
 // private:
+  M8WaveType wave_type = M8_WAVE_SAWTOOTH;
   int table_size = 256;
   float table_size_inv = 0.00390625; // 1/TABLE_SIZE;
   uint8_t wavetable [256];
-  String curr_wave = "sawtooth";
   uint8_t wav_phase_offset = 127;
   float phase_fractional = 1.0;
   float table_index = 0.0;
@@ -118,5 +129,5 @@ public:
   float table_index2 = 0.0;
   float detune = 0.002;
 };
-  
+
 #endif /* M8OSC_H_ */

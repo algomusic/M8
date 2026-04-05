@@ -41,12 +41,12 @@ public:
 
   uint8_t next(uint8_t sample) {
     if (attack_stage) { //attack;
-      env_val += attack; 
+      env_val += attack;
       if (env_val >= env_gain) attack_stage = false;
-      return round(sample * env_val);
+      return (uint8_t)(sample * env_val + 0.5f);
     } else { // decay
       env_val *= decay;
-      return round(sample * env_val);
+      return (uint8_t)(sample * env_val + 0.5f);
     }
   }
 
